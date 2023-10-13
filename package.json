@@ -1,0 +1,40 @@
+{
+  "name": "voice_bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": " node build/src/main.js",
+    "dev": "node build/src/domains/main.js "
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@tsconfig/node-lts": "^18.12.5",
+    "@types/mongodb": "^4.0.7",
+    "@types/node": "^20.8.3",
+    "@types/pdfkit": "^0.12.12",
+    "cross-env": "^7.0.3",
+    "nodemon": "^3.0.1",
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "@ffmpeg-installer/ffmpeg": "^1.1.0",
+    "@types/config": "^3.3.1",
+    "@types/fluent-ffmpeg": "^2.1.22",
+    "@types/node-telegram-bot-api": "^0.61.8",
+    "axios": "^1.5.1",
+    "config": "^3.3.9",
+    "fluent-ffmpeg": "^2.1.2",
+    "form-data": "^4.0.0",
+    "mongodb": "^6.1.0",
+    "node-fetch": "^3.3.2",
+    "node-telegram-bot-api": "^0.63.0",
+    "openai": "^4.11.1",
+    "p-timeout": "^6.1.2",
+    "pdfkit": "^0.13.0",
+    "telegraf": "^4.14.0"
+  }
+}
