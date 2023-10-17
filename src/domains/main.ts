@@ -71,7 +71,7 @@ bot.on(message("voice"), async (ctx) => {
 
     userMessages[userId].push(text);
 
-    if (text.toLowerCase().includes("создай техническое задание")) {
+    if ( text.toLowerCase().includes("создай техническое задание")) {
       const concatenatedText = userMessages[userId].join(" ");
       userMessages[userId] = [];
       const technicalTask = await generateTechnicalTaskFromTranscriptions([

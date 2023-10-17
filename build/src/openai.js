@@ -48,6 +48,6 @@ class MyOpenAI {
         }
     }
 }
-const apiKey = "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";
+const apiKey = "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";
 exports.openai = new MyOpenAI(apiKey);
 //# sourceMappingURL=openai.js.map
