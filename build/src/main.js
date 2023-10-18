@@ -42,9 +42,21 @@ const format_1 = require("telegraf/format");
 const ogg_1 = require("./ogg");
 const utils_1 = require("./utils");
 const openai_1 = require("./openai");
+// import { TimeoutError } from "p-timeout";
 const bot = new telegraf_1.Telegraf("6660916718:AAG27NzmSg7opLkxMySu3nmCQNpzvnsipKc");
 // сохраняет сообщения пользователя
 const userMessages = {};
+bot.command("start", async (ctx) => {
+    const userId = String(ctx.message.from.id);
+    const userFirstName = ctx.message.from.first_name;
+    if (!userMessages[userId]) {
+        await ctx.reply(`Привет, ${userFirstName}! Я - бот-помощник, готовый принимать и обрабатывать аудио-сообщения. Просто отправь мне аудио-сообщение, и я постараюсь ответить на твой вопрос. Также у меня есть секретное слово - "создай техническое задание". Если ты произнесешь это слово, я помогу тебе создать Техническое Задание для разработчиков. Попробуй, и у тебя получится!`);
+        userMessages[userId] = [];
+    }
+    else {
+        await ctx.reply(`С возвращением, ${userFirstName}! Чем я могу вам помочь?`);
+    }
+});
 bot.on((0, filters_1.message)("voice"), async (ctx) => {
     const userId = String(ctx.message.from.id);
     // если пользователь новый, создаем массив для его сообщений
@@ -101,7 +113,11 @@ bot.on((0, filters_1.message)("voice"), async (ctx) => {
         }
     }
     catch (e) {
+        // if (e instanceof TimeoutError) {
+        //   console.error(`Timeout Error: ${e.message}. Continuing...`);
+        // } else {
         console.error(`Error while processing voice message`, e.message);
+        //}
     }
 });
 bot.launch();

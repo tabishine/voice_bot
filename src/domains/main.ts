@@ -44,30 +44,22 @@ import { code } from "telegraf/format";
 import { ogg } from "./ogg";
 import { removeFile } from "./utils";
 import { openai } from "./openai";
-import { TimeoutError } from "p-timeout";
+// import { TimeoutError } from "p-timeout";
 
 const bot = new Telegraf("6660916718:AAG27NzmSg7opLkxMySu3nmCQNpzvnsipKc");
 // сохраняет сообщения пользователя
 const userMessages: { [key: string]: string[]} = {};
 
-
 bot.command("start", async (ctx) => {
   const userId = String(ctx.message.from.id);
   const userFirstName = ctx.message.from.first_name;
-
-  // Check if the user is new (has no previous interactions with the bot)
   if (!userMessages[userId]) {
-    // If the user is new, send a welcome message
     await ctx.reply(`Привет, ${userFirstName}! Я - бот-помощник, готовый принимать и обрабатывать аудио-сообщения. Просто отправь мне аудио-сообщение, и я постараюсь ответить на твой вопрос. Также у меня есть секретное слово - "создай техническое задание". Если ты произнесешь это слово, я помогу тебе создать Техническое Задание для разработчиков. Попробуй, и у тебя получится!`);
-    
-    // Now, you can mark the user as existing by creating an empty array
-    userMessages[userId] = [];
+        userMessages[userId] = [];
   } else {
-    // If the user is not new, you can handle it differently, e.g., provide instructions or respond to their query
     await ctx.reply(`С возвращением, ${userFirstName}! Чем я могу вам помочь?`);
   }
 });
-
 
 
 bot.on(message("voice"), async (ctx) => {
@@ -126,11 +118,11 @@ bot.on(message("voice"), async (ctx) => {
       }
     }
   } catch (e: any) {
-    if (e instanceof TimeoutError) {
-      console.error(`Timeout Error: ${e.message}. Continuing...`);
-    } else {
+    // if (e instanceof TimeoutError) {
+    //   console.error(`Timeout Error: ${e.message}. Continuing...`);
+    // } else {
       console.error(`Error while processing voice message`, e.message);
-    }
+    //}
 
   }
 });
