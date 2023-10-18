@@ -48,14 +48,21 @@ import { TimeoutError } from "p-timeout";
 
 const bot = new Telegraf("6660916718:AAG27NzmSg7opLkxMySu3nmCQNpzvnsipKc");
 // сохраняет сообщения пользователя
-const userMessages: { [key: string]: string[] } = {};
+const userMessages: { [key: string]: string[]} = {};
+
 
 bot.command("start", async (ctx) => {
-  // const userId = String(ctx.message.from.id);
+  const userId = String(ctx.message.from.id);
   const userFirstName = ctx.message.from.first_name;
-  await ctx.reply(`Привет, ${userFirstName}! Я - бот-помощник, готовый принимать и обрабатывать аудио-сообщения. Просто отправь мне аудио-сообщение, и я постараюсь ответить на твой вопрос. Также у меня есть секретное слово - "создай техническое задание". Если ты произнесешь это слово, я помогу тебе создать Техническое Задание для разработчиков. Попробуй, и у тебя получится!`);
 
-})
+  if (!userMessages[userId]) {
+    // If the user doesn't exist, create an empty array to indicate their presence
+    userMessages[userId] = [];
+  }
+
+  await ctx.reply(`Привет, ${userFirstName}! Я - бот-помощник, готовый принимать и обрабатывать аудио-сообщения. Просто отправь мне аудио-сообщение, и я постараюсь ответить на твой вопрос. Также у меня есть секретное слово - "создай техническое задание". Если ты произнесешь это слово, я помогу тебе создать Техническое Задание для разработчиков. Попробуй, и у тебя получится!`);
+});
+
 
 bot.on(message("voice"), async (ctx) => {
   const userId = String(ctx.message.from.id);
