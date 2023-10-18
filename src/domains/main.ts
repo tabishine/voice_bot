@@ -44,14 +44,21 @@ import { code } from "telegraf/format";
 import { ogg } from "./ogg";
 import { removeFile } from "./utils";
 import { openai } from "./openai";
+import { TimeoutError } from "p-timeout";
 
 const bot = new Telegraf("6660916718:AAG27NzmSg7opLkxMySu3nmCQNpzvnsipKc");
 // сохраняет сообщения пользователя
 const userMessages: { [key: string]: string[] } = {};
 
+bot.command("start", async (ctx) => {
+  // const userId = String(ctx.message.from.id);
+  const userFirstName = ctx.message.from.first_name;
+  await ctx.reply(`Привет, ${userFirstName}! Я - бот-помощник, готовый принимать и обрабатывать аудио-сообщения. Просто отправь мне аудио-сообщение, и я постараюсь ответить на твой вопрос. Также у меня есть секретное слово - "создай техническое задание". Если ты произнесешь это слово, я помогу тебе создать Техническое Задание для разработчиков. Попробуй, и у тебя получится!`);
+
+})
+
 bot.on(message("voice"), async (ctx) => {
   const userId = String(ctx.message.from.id);
-
   // если пользователь новый, создаем массив для его сообщений
   if (!userMessages[userId]) {
     userMessages[userId] = [];
@@ -63,6 +70,7 @@ bot.on(message("voice"), async (ctx) => {
     const userId = String(ctx.message.from.id);
     const oggPath = await ogg.create(link.href, userId);
     //конвертация аудио ogg формата в mp3
+
     const mp3Path = await ogg.toMp3(oggPath, userId);
     removeFile(oggPath);
     const text = await openai.transcribeAudio(mp3Path);
@@ -105,7 +113,12 @@ bot.on(message("voice"), async (ctx) => {
       }
     }
   } catch (e: any) {
-    console.error(`Error while processing voice message`, e.message);
+    if (e instanceof TimeoutError) {
+      console.error(`Timeout Error: ${e.message}. Continuing...`);
+    } else {
+      console.error(`Error while processing voice message`, e.message);
+    }
+
   }
 });
   
