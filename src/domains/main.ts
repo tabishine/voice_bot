@@ -44,7 +44,7 @@ import { code } from "telegraf/format";
 import { ogg } from "./ogg";
 import { removeFile } from "./utils";
 import { openai } from "./openai";
-// import { TimeoutError } from "p-timeout";
+import { TimeoutError } from "p-timeout";
 
 const bot = new Telegraf("6660916718:AAG27NzmSg7opLkxMySu3nmCQNpzvnsipKc");
 // сохраняет сообщения пользователя
@@ -118,11 +118,11 @@ bot.on(message("voice"), async (ctx) => {
       }
     }
   } catch (e: any) {
-    // if (e instanceof TimeoutError) {
-    //   console.error(`Timeout Error: ${e.message}. Continuing...`);
-    // } else {
+    if (e instanceof TimeoutError) {
+      console.error(`Timeout Error: ${e.message}. Continuing...`);
+    } else {
       console.error(`Error while processing voice message`, e.message);
-    //}
+    }
 
   }
 });
@@ -153,7 +153,7 @@ function clearUserMessages(userId: string) {
         new Promise((_, reject) => setTimeout(() => reject("Timeout"), 1800000),)
       ]);
   
-    return response;
+    return response; 
 }
 
   

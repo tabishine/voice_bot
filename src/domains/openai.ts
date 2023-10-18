@@ -43,7 +43,11 @@ class MyOpenAI {
         }
       );
  
-      const responseTranscribe = response.data.text;
+      const responseTranscribe = await Promise.race([
+        response.data.text,
+        new Promise((_, reject) => setTimeout(() => reject("Timeout"), 1800000),)
+       ]);
+       
       console.log("Transcription:", responseTranscribe);
       return responseTranscribe;
     } catch (error: any) {
