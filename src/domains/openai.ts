@@ -23,7 +23,7 @@ class MyOpenAI {
     } catch (error: any) {
       console.error("Error while chat", error.message);
       throw error;
-    }
+    } 
   }
 
   async transcribeAudio(filepath: string) {
