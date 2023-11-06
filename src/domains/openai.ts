@@ -4,7 +4,7 @@ import axios from "axios";
 import FormData from "form-data";
 import { text } from "telegraf/typings/button";
 
-class MyOpenAI {
+export class MyOpenAI {
   private openai: OpenAI;
   private apiKey: string;
 

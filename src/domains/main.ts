@@ -44,7 +44,42 @@ import { code } from "telegraf/format";
 import { ogg } from "./ogg";
 import { removeFile } from "./utils";
 import { openai } from "./openai";
-// import { TimeoutError } from "p-timeout";
+import { transcribeAudioQueue, sendTranscribeJobData} from "../queues/transcribeQueue"
+import {Worker} from "bullmq";
+import { responseMessageQueue, sendMessageJobData } from "../queues/responseQueue";
+//queue processes, worker mode on 
+transcribeAudioQueue.process(async (job) => {
+  const { mp3Path } = job.data;
+  const text = await openai.transcribeAudio(mp3Path);
+  return text;
+});
+
+//  Bull worker process to listen for and process jobs
+const transcribeWorker = new Worker<sendTranscribeJobData>("send-transcribe-jobdata", async (job) => {
+  const { mp3Path } = job.data;
+  const text = await openai.transcribeAudio(mp3Path);
+  return text;
+});
+
+ transcribeWorker.on('completed', (job) => {
+  console.log(`TRANSCRIBING AUDIO ${job.id} completed`);
+});
+//response queue
+responseMessageQueue.process(async(job) =>{
+  const { messages } = job.data;
+  const response = await openai.chatWithChatgpt(messages);
+  return response;
+})
+
+const responseWorker = new Worker<sendMessageJobData>("send-transcribe-jobdata", async (job) => {
+  const { messages } = job.data;
+  const response = await openai.chatWithChatgpt(messages);
+  return response;
+});
+
+responseWorker.on('completed', (job) => {
+  console.log(`CHAT WITH CHATGPT ${job.id} completed`);
+});
 
 const bot = new Telegraf("6660916718:AAG27NzmSg7opLkxMySu3nmCQNpzvnsipKc");
 // сохраняет сообщения пользователя
@@ -75,16 +110,17 @@ bot.on(message("voice"), async (ctx) => {
     const userId = String(ctx.message.from.id);
     const oggPath = await ogg.create(link.href, userId);
     //конвертация аудио ogg формата в mp3
-
     const mp3Path = await ogg.toMp3(oggPath, userId);
     removeFile(oggPath);
-    const text = await openai.transcribeAudio(mp3Path);
-    console.log(text);
+    const transcribeJob = await transcribeAudioQueue.add({ mp3Path });
+    const text = await transcribeJob.finished();
+    // const text = await openai.transcribeAudio(mp3Path);   //last version of 
+    console.log(text, "transcribing audio in queue is finished");
     await ctx.reply(code(`Ваш вопрос: ${text}`));
 
     userMessages[userId].push(text);
 
-    if ( text.toLowerCase().includes("создай техническое задание")) {
+    if (text.toLowerCase().includes("создай техническое задание")) {
       const concatenatedText = userMessages[userId].join(" ");
       userMessages[userId] = [];
       const technicalTask = await generateTechnicalTaskFromTranscriptions([
@@ -99,7 +135,10 @@ bot.on(message("voice"), async (ctx) => {
           content: userMessage,
         }));
         
-        const response = await openai.chatWithChatgpt(messages);
+        const responseJob = await responseMessageQueue.add({messages});
+        const response = await responseJob.finished();
+        console.log(response, "response in queue is finished");
+
         if (response) {
           await ctx.reply(response);
         } else {
@@ -146,7 +185,7 @@ function clearUserMessages(userId: string) {
   
     const response = await Promise.race([
         openai.chatWithChatgpt(messages),
-        new Promise((_, reject) => setTimeout(() => reject("Timeout"), 1800000),)
+        new Promise((_, reject) => setTimeout(() => reject("Timeout"),  180000),)
       ]);
   
     return response; 
