@@ -51,7 +51,6 @@ class MyOpenAI {
         }
     }
 }
-exports.MyOpenAI = MyOpenAI;
 const apiKey = "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";
 exports.openai = new MyOpenAI(apiKey);
 //# sourceMappingURL=openai.js.map

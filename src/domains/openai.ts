@@ -56,5 +56,5 @@ export class MyOpenAI {
   }
 }
 
-const apiKey = "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";
+const apiKey = "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";
 export const openai = new MyOpenAI(apiKey);
